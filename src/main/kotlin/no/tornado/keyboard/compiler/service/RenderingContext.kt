@@ -40,19 +40,24 @@ class RenderingContext(val keymap: Keymap) {
 
         val s = StringBuilder()
 
+        s.append("#include \"tornado.h\"\n#include \"action_layer.h\"\n\n")
+
         s.append("const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {\n")
 
         s.append(keymap.layers.joinToString(",\n\n", transform = this::render))
 
         s.append("\n};\n\n")
 
-        s.append("const uint16_t PROGMEM fn_actions[] = {\n")
+        if (fnActions.isNotEmpty()) {
+            s.append("const uint16_t PROGMEM fn_actions[] = {\n")
 
-        fnActions.forEach { key ->
-            s.append("\t[${fnActions.indexOf(key)}] = ${key.layerToggleType?.actionName}(${key.layer}),")
+            fnActions.forEach { key ->
+                s.append("\t[${fnActions.indexOf(key)}] = ${key.layerToggleType?.actionName}(${key.layer}),")
+            }
+
+            s.append("\n};\n")
         }
 
-        s.append("\n};\n")
         return s.toString()
     }
 
